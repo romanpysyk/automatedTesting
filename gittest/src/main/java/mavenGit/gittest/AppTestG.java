@@ -13,7 +13,7 @@ public class AppTestG
     	System.setProperty("webdriver.chrome.driver", "C:/Users/SeleniumDrivers/chromedriver.exe");
     	
     	chrome = new ChromeDriver();
-    	String eTitle = "Meet Guru99";
+    	String eTitle = "Meet Guru99 - Free Training Tutorials & Video for IT Courses";
     	String aTitle = "";
     	chrome.get("http://www.guru99.com/");
     	chrome.manage().window().maximize();
