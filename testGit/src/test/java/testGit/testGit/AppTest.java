@@ -15,7 +15,7 @@ public class AppTest {
 		
 		chrome = new ChromeDriver();
 		
-		String eTitle = "Meet Guru99 - Free Training Tutorials & Videos for IT Courses";
+		String eTitle = "Meet Guru99 - Free Training Tutorials & Video for IT Courses";
 		String aTitle = "";
 		chrome.get("http://www.guru99.com/");
 		chrome.manage().window().maximize();
