@@ -2,6 +2,7 @@ package testGit.testGit;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class AppTest {
@@ -14,18 +15,14 @@ public class AppTest {
 		
 		chrome = new ChromeDriver();
 		
-		String eTitle = "Meet Guru99";
+		String eTitle = "Meet Guru99 - Free Training Tutorials & Video for IT Courses";
 		String aTitle = "";
 		chrome.get("http://www.guru99.com/");
 		chrome.manage().window().maximize();
 		
 		aTitle = chrome.getTitle();
-		if(aTitle.contentEquals(eTitle)){
-			System.out.println("Succsess. Test passed!");
-		} else
-		{
-			System.out.println("Loh! Test Failed");
-		}
+		Assert.assertTrue(aTitle.contentEquals(eTitle));
+		
 		chrome.close();
 	}
 }
