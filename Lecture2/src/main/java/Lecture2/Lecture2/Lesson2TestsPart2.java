@@ -33,10 +33,10 @@ public class Lesson2TestsPart2 {
 		
 		for(int i = 0; i<menuXpathes.length; i++){
 			chrome.findElement(By.xpath(menuXpathes[i])).click();
-			String dashTitle = chrome.getTitle();
-			System.out.println(dashTitle);
+			String pageTitle = chrome.getTitle();
+			System.out.println(pageTitle);
 			chrome.navigate().refresh();
-			if(chrome.getTitle().contentEquals(dashTitle)){
+			if(chrome.getTitle().contentEquals(pageTitle)){
 				Thread.sleep(3000);
 			} else {
 				System.out.println("error");
