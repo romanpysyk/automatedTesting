@@ -11,7 +11,7 @@ public class Lesson2TestsPart2 {
 		menuXpathes[0] = "//span[contains(text(), 'Dashboard')]";
 		menuXpathes[1] = "//*[@data-submenu='3']";
 		menuXpathes[2] = "//*[@data-submenu='9']";
-		menuXpathes[3] = "//*[@data-submenu='23']";
+		menuXpathes[3] = "//*[@data-submenu='11']";
 		menuXpathes[4] = "//*[@data-submenu='27']";
 		menuXpathes[5] = "//*[@data-submenu='31']";
 		menuXpathes[6] = "//*[@data-submenu='42']";
@@ -20,7 +20,7 @@ public class Lesson2TestsPart2 {
 		menuXpathes[9] = "//*[@data-submenu='55']";
 		menuXpathes[10] = "//*[@data-submenu='58']";
 		menuXpathes[11] = "//*[@data-submenu='73']";
-		menuXpathes[12] = "//*[@data-submenu='95']";
+		menuXpathes[12] = "//*[@data-submenu='11']";
 		
 		WebDriver chrome = driverInitialization();
 		chrome.get("http://prestashop-automation.qatestlab.com.ua/admin147ajyvk0/");

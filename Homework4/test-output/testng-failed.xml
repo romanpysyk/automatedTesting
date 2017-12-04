@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite thread-count="3" guice-stage="DEVELOPMENT" name="Failed suite [TestSuite]" parallel="tests">
+  <parameter name="browser" value="InternetExplorer"/>
+  <test name="ChromeTest">
+    <parameter name="browser" value="Chrome"/>
+    <classes>
+      <class name="Homework4.Homework4.MainTests"/>
+    </classes>
+  </test> <!-- ChromeTest -->
+  <test name="FirefoxTest">
+    <parameter name="browser" value="Firefox"/>
+    <classes>
+      <class name="Homework4.Homework4.MainTests"/>
+    </classes>
+  </test> <!-- FirefoxTest -->
+  <test name="InternetExplorerTest">
+    <parameter name="browser" value="InternetExplorer"/>
+    <classes>
+      <class name="Homework4.Homework4.MainTests"/>
+    </classes>
+  </test> <!-- InternetExplorerTest -->
+  <test name="InternetExplorerTest(failed)" parallel="tests">
+    <parameter name="browser" value="InternetExplorer"/>
+    <classes>
+      <class name="Homework4.Homework4.MainTests">
+        <methods>
+          <include name="saveGood"/>
+          <include name="openShop"/>
+          <include name="checkGood"/>
+          <include name="setUp"/>
+          <include name="setUp"/>
+          <include name="setUp"/>
+          <include name="logIn" invocation-numbers="0"/>
+          <include name="activateNewGood"/>
+          <include name="openGoodsPage"/>
+        </methods>
+      </class> <!-- Homework4.Homework4.MainTests -->
+    </classes>
+  </test> <!-- InternetExplorerTest(failed) -->
+  <test name="FirefoxTest(failed)" parallel="tests">
+    <parameter name="browser" value="Firefox"/>
+    <classes>
+      <class name="Homework4.Homework4.MainTests">
+        <methods>
+          <include name="saveGood"/>
+          <include name="openShop"/>
+          <include name="checkGood"/>
+          <include name="setUp"/>
+          <include name="setUp"/>
+          <include name="setUp"/>
+          <include name="logIn"/>
+          <include name="activateNewGood"/>
+          <include name="openGoodsPage"/>
+        </methods>
+      </class> <!-- Homework4.Homework4.MainTests -->
+    </classes>
+  </test> <!-- FirefoxTest(failed) -->
+</suite> <!-- Failed suite [TestSuite] -->
