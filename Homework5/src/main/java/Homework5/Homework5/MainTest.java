@@ -1,96 +1,177 @@
 package Homework5.Homework5;
 
-import java.util.concurrent.TimeUnit;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.testng.annotations.BeforeClass;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-public class MainTest {
-		public static void main (String [] args) throws InterruptedException {
 
-	System.setProperty("webdriver.chrome.driver", "src/resources/chromedriver.exe");
-	WebDriver driver = new ChromeDriver();
-	driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-	driver.get("http://prestashop-automation.qatestlab.com.ua/ru/");
+public class MainTest extends BasicsDataMethods {
+	
+    Pattern pattern = Pattern.compile("\\d+");
+	
+	String goodName;
+	String goodPrice;
+	int goodQuantity;
+	
+	@BeforeTest
+    @Parameters("browser")
+    public void setUp(String browser) throws MalformedURLException {
+    	if(browser.equalsIgnoreCase("firefox")){
+    		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+    		driver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
+    	}
+    	if(browser.equalsIgnoreCase("chrome")){
+    		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+    		driver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
+    	}
+    	if(browser.equalsIgnoreCase("internetexplorer")){
+    		DesiredCapabilities capabilities = DesiredCapabilities.internetExplorer();
+    		driver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
+    	}
+    }
+	
+	@Test
+	public void openShop() {
+	driver.get(shopURL);
+	Assert.assertEquals(driver.getTitle(), mainPageTitle);
+	}
+	
+	@Test(dependsOnMethods = "openShop")
+	public void openAllGoodsPage() {
+	JavascriptExecutor js = (JavascriptExecutor)driver;
+	js.executeScript("window.scrollBy(0, 1200)");
+	driver.findElement(allGoodsLink).click();
+	Assert.assertEquals(driver.getTitle(), allGoodsTitle);
+	}
+	
+	@Test(dependsOnMethods = "openAllGoodsPage")
+	public void getProductName() {
+	JavascriptExecutor js = (JavascriptExecutor)driver;
+	js.executeScript("window.scrollBy(0, 400)");
+	driver.findElement(productNameLink).click();
+	js.executeScript("window.scrollBy(0, 400)");
+	goodName = driver.findElement(productName).getText();
+	}
+	
+	@Test(dependsOnMethods = "getProductName")
+	public void getProductPrice() {
+	goodPrice = driver.findElement(productPrice).getText();
+	}
+	
+	@Test(dependsOnMethods = "getProductPrice")
+	public void getAllQuantity() {
+	WebDriverWait wait = new WebDriverWait(driver, 10);
+	wait.until(ExpectedConditions.presenceOfElementLocated(productDescriprion));
+	driver.findElement(productDescriprion).click();
+	wait.until(ExpectedConditions.presenceOfElementLocated(generalQuantity));
+	String allQuant = driver.findElement(generalQuantity).getText();
+	Matcher matcher = pattern.matcher(allQuant);
+    int start = 0;
+    while (matcher.find(start)) {
+       String value = allQuant.substring(matcher.start(), matcher.end());
+       goodQuantity = Integer.parseInt(value);
+       start = matcher.end();
+		}
+	}
+    
+    @Test(dependsOnMethods = "getAllQuantity")
+    public void putProductInCart() {
+    WebDriverWait wait = new WebDriverWait(driver, 10);
+    wait.until(ExpectedConditions.presenceOfElementLocated(putIntoCart));
+	driver.findElement(putIntoCart).click();
+    }
+    
+    
+    @Test(dependsOnMethods = "putProductInCart")
+    public void verifyOrderedProduct() {
+    WebDriverWait wait = new WebDriverWait(driver, 10);
+    wait.until(ExpectedConditions.presenceOfElementLocated(navigateOrderDetailsPage));
+	driver.findElement(navigateOrderDetailsPage).click();
+    wait.until(ExpectedConditions.presenceOfElementLocated(orderedProductName));
+	Assert.assertTrue(goodName.equalsIgnoreCase(driver.findElement(orderedProductName).getText()));
+	wait.until(ExpectedConditions.presenceOfElementLocated(orderedProductPrice));
+	Assert.assertTrue(goodPrice.equals(driver.findElement(orderedProductPrice).getText()));
+	wait.until(ExpectedConditions.presenceOfElementLocated(orderedProductQuantity));
+	Assert.assertTrue(driver.findElement(orderedProductQuantity).getText().equals("1 шт."));
+	}
+    
+    @Test(dependsOnMethods = "verifyOrderedProduct")
+    public void fillOrderDetails(){
+    WebDriverWait wait = new WebDriverWait(driver, 10);
+    wait.until(ExpectedConditions.presenceOfElementLocated(processWithOrderButton));
+	driver.findElement(processWithOrderButton).click();
+	wait.until(ExpectedConditions.presenceOfElementLocated(firstNameField));
+	driver.findElement(firstNameField).sendKeys(clientFirstName);
+	driver.findElement(lastNameField).sendKeys(clientLastName);
+	driver.findElement(emailField).sendKeys(clientEmail);
+	JavascriptExecutor js = (JavascriptExecutor)driver;
+	js.executeScript("window.scrollBy(0, 1000)");
+	driver.findElement(continueButton).click();
+	driver.findElement(addressField).sendKeys(clientAddress);
+	js.executeScript("window.scrollBy(0, 500)");
+	driver.findElement(postCodeField).sendKeys(clientPostCode);
+	driver.findElement(cityField).sendKeys(clientCity);
+	js.executeScript("window.scrollBy(0, 500)");
+	driver.findElement(deliveryOptionsButton).click();
+	wait.until(ExpectedConditions.presenceOfElementLocated(confirmDeliveryButton));
+	driver.findElement(confirmDeliveryButton).click();
+	wait.until(ExpectedConditions.presenceOfElementLocated(paymentOption2));
+	driver.findElement(paymentOption2).click();
+	js.executeScript("window.scrollBy(0, 300)");
+	driver.findElement(termsCheckBox).click();
+	driver.findElement(orderProductButton).click();
+    }
+    
+    @Test(dependsOnMethods = "fillOrderDetails")
+    public void verifyOrderDetails() {
+    WebDriverWait wait = new WebDriverWait(driver, 10);
+    wait.until(ExpectedConditions.presenceOfElementLocated(orderConfirmed));
+    Assert.assertTrue(driver.findElement(orderConfirmed).getText().contains(confirmationMessage));
+	String orderedGoodName = driver.findElement(orderedItemDetails).getText().toLowerCase();
+	Assert.assertTrue(orderedGoodName.contains(goodName.toLowerCase()));
+	Assert.assertTrue(driver.findElement(orderedItemPrice).getText().equalsIgnoreCase(goodPrice));
+	Assert.assertTrue(driver.findElement(orderedItemCount).getText().equals("1"));
+    }
+	
+	@Test(dependsOnMethods = "verifyOrderDetails")
+	public void verifyProductCountReduce() {
+	driver.findElement(mainPageItem).click();
 	JavascriptExecutor js = (JavascriptExecutor)driver;
     js.executeScript("window.scrollBy(0, 1200)");
-	driver.findElement(By.xpath("//*[@id='content']/section/a")).click();
+	driver.findElement(allGoodsLink).click();
 	js.executeScript("window.scrollBy(0, 400)");
-	driver.findElement(By.linkText("Faded Short Sleeve T-shirts")).click();
+	driver.findElement(productNameLink).click();
 	js.executeScript("window.scrollBy(0, 400)");
-	String nameOf = driver.findElement(By.xpath("//*[@id='main']/div[1]/div[2]/h1")).getText();
-	String price = driver.findElement(By.xpath("//*[@id='main']/div[1]/div[2]/div[1]/div[1]/div/span")).getText();
-	driver.findElement(By.xpath("//*[@id='main']/div[1]/div[2]/div[2]/div[3]/ul/li[2]/a")).click();
-	Thread.sleep(3000);
-	String allQuant = driver.findElement(By.xpath("//*[@id='product-details']/div[3]/span")).getText();
-	System.out.println(allQuant);
-	driver.findElement(By.xpath("//*[@id='add-to-cart-or-refresh']/div[2]/div[1]/div[2]/button")).click();
-	Thread.sleep(5000);
-	driver.findElement(By.xpath("//*[@id='blockcart-modal']/div/div/div[2]/div/div[2]/div/a")).click();
-	Thread.sleep(5000);
-
-	if(nameOf.equalsIgnoreCase(driver.findElement(By.xpath("//*[@id='main']/div/div[1]/div[1]/div[2]/ul/li/div/div[2]/div[1]/a")).getText())){
-		System.out.println(nameOf);
-	} else {System.out.println("error");}
-	Thread.sleep(5000);
-	if(price.equals(driver.findElement(By.xpath("//*[@id='main']/div/div[1]/div[1]/div[2]/ul/li/div/div[2]/div[2]/span")).getText())){
-		System.out.println(price);
-	} else {driver.quit();}
-	Thread.sleep(5000);
-	if(driver.findElement(By.xpath("//*[@id='cart-subtotal-products']/span[1]")).getText().equals("1 шт.")){
-		System.out.println(driver.findElement(By.xpath("//*[@id='cart-subtotal-products']/span[1]")).getText());
-	} else {driver.quit();}
+    WebDriverWait wait = new WebDriverWait(driver, 10);
+	wait.until(ExpectedConditions.presenceOfElementLocated(productDescriprion));
+	driver.findElement(productDescriprion).click();
+	wait.until(ExpectedConditions.presenceOfElementLocated(generalQuantity));
+	String currentCount = driver.findElement(generalQuantity).getText();
+	Matcher matcher = pattern.matcher(currentCount);
+    int start = 0;
+    int countAfterTest = 0;
+    while (matcher.find(start)) {
+       String value = currentCount.substring(matcher.start(), matcher.end());
+       countAfterTest = Integer.parseInt(value);
+       start = matcher.end();
+		}
+    Assert.assertTrue((goodQuantity - 1) == countAfterTest);
+	}
 	
-	driver.findElement(By.xpath("//*[@id='main']/div/div[2]/div/div[2]/div/a")).click();
-	Thread.sleep(3000);
-	driver.findElement(By.name("firstname")).sendKeys("Roman");
-	driver.findElement(By.name("lastname")).sendKeys("Testuser");
-	driver.findElement(By.name("email")).sendKeys("romantestqa29@gmail.com");
-	js.executeScript("window.scrollBy(0, 1000)");
-
-	driver.findElement(By.name("continue")).click();
-	driver.findElement(By.name("address1")).sendKeys("Main Road 77/75");
-	js.executeScript("window.scrollBy(0, 500)");
-	driver.findElement(By.name("postcode")).sendKeys("33375");
-	driver.findElement(By.name("city")).sendKeys("Melburn");
-	js.executeScript("window.scrollBy(0, 500)");
-	driver.findElement(By.name("confirm-addresses")).click();
-	
-	Thread.sleep(3000);
-	driver.findElement(By.name("confirmDeliveryOption")).click();
-	Thread.sleep(3000);
-	driver.findElement(By.xpath("//*[@id='payment-option-2-container']/label/span")).click();
-	js.executeScript("window.scrollBy(0, 300)");
-	driver.findElement(By.name("conditions_to_approve[terms-and-conditions]")).click();
-	driver.findElement(By.xpath("//*[@id='payment-confirmation']/div[1]/button")).click();
-	Thread.sleep(5000);
-	
-	Thread.sleep(3000);
-	String confirm = driver.findElement(By.xpath("//*[@id='content-hook_order_confirmation']/div/div/div/h3")).getText();
-	System.out.println(driver.findElement(By.xpath("//*[@id='content-hook_order_confirmation']/div/div/div/h3")).isDisplayed());
-	System.out.println(confirm);
-	
-	String orderName = driver.findElement(By.xpath("//*[@id='order-items']/div/div/div[2]/span")).getText().toLowerCase();
-	System.out.println(orderName.contains(nameOf.toLowerCase()));
-	System.out.println(nameOf);
-	System.out.println(orderName);
-	
-	String orderPrice = driver.findElement(By.xpath("//*[@id='order-items']/div/div/div[3]/div/div[1]")).getText();
-	System.out.println("prices + " + orderPrice.equalsIgnoreCase(price));
-	
-	String orderedQuant = driver.findElement(By.xpath("//*[@id='order-items']/div/div/div[3]/div/div[2]")).getText();
-	System.out.println("kilsist +" + orderedQuant.equals("1"));
-	
-	driver.findElement(By.xpath("//*[@id='_desktop_logo']/a/img")).click();
-    js.executeScript("window.scrollBy(0, 1200)");
-	driver.findElement(By.xpath("//*[@id='content']/section/a")).click();
-	js.executeScript("window.scrollBy(0, 400)");
-	driver.findElement(By.linkText("Faded Short Sleeve T-shirts")).click();
-
-}
+	@AfterTest
+	public void shutDown() {
+		driver.quit();
+	}
 }

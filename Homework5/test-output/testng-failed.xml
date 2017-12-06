@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite guice-stage="DEVELOPMENT" name="Failed suite [Default suite]">
+  <parameter name="browser" value="InternetExplorer"/>
   <test verbose="2" name="Default test">
     <classes>
-      <class name="Homework5.Homework5.MainTests5"/>
+      <class name="Homework5.Homework5.MainTest">
+        <methods>
+          <include name="setUp"/>
+        </methods>
+      </class> <!-- Homework5.Homework5.MainTest -->
     </classes>
   </test> <!-- Default test -->
-  <test name="Default test(failed)">
-    <classes>
-      <class name="Homework5.Homework5.MainTests5">
-        <methods>
-          <include name="wholeTest"/>
-          <include name="enableDriver"/>
-        </methods>
-      </class> <!-- Homework5.Homework5.MainTests5 -->
-    </classes>
-  </test> <!-- Default test(failed) -->
 </suite> <!-- Failed suite [Default suite] -->
